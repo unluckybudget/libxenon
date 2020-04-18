@@ -465,12 +465,12 @@ if [ "$1" == "toolchain" ]; then
     #libxenon_install
     all_done
 elif [ "$1" == "libs" ]; then
-    zlib_install
+    #zlib_install
     bzip2_install
-    libpng_install
-    freetype_install
+    #libpng_install
+    #freetype_install
     bin2s_install
-    filesystems_install
+    #filesystems_install
 elif [ "$1" == "libxenon" ]; then
     libxenon_install
 elif [ "$1" == "zlib" ]; then
