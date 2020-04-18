@@ -462,7 +462,7 @@ static iso_dirent_t *find_object(const char *fn, int dir, u32 dir_extent, u32 di
 					else
 						fnlen = strlen(fn);
 
-					if (!strnicmp(rrname, fn, fnlen)) {
+					if (!strncasecmp(rrname, fn, fnlen)) {
 						if (!((dir << 1) ^ de->flags))
 							return de;
 					}
