@@ -8,13 +8,18 @@ Ubuntu Depends:
   
 Build the Toolchain
   Clone this repository
+	
   cd libxenon/toolchain
-  nano buid-xenon-toolchain - set PARALLEL=jx where x is the amount of CPU cores available.
-  ./build-xenon-toolchain toolchain
+  
+	nano buid-xenon-toolchain - set PARALLEL=jx where x is the amount of CPU cores available.
+  
+	./build-xenon-toolchain toolchain
   
   If you're watching the terminal, you will see 2 occurances the below error, one in each GCC stage:
-    "cc1: error: no include path in which to search for stdc-predef.h"
-  This can be safely disregarded.
+  
+	"cc1: error: no include path in which to search for stdc-predef.h"
+  
+	This can be safely disregarded.
   
   Once the script finishes (~1 hour with a Core2Duo processor), modify ~/.bashrc as instructed.
   
