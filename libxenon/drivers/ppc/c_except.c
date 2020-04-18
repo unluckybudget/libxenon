@@ -120,10 +120,10 @@ void crashdump(u32 exception,u64 * context)
 		}
 	}
 #else
-	strcat(text,"\n\nRebooting to Xell in 30 seconds...\n\n");
+	strcat(text,"\n\nSoft reboot in 10 seconds...\n\n");
 	flush_console();
 	
-	delay(30);
-	exit(0);
+	delay(10);
+	xenon_smc_power_reboot();
 #endif
 }
