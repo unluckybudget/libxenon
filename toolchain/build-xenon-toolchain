@@ -5,7 +5,7 @@
 
 TARGET=xenon
 PREFIX=/usr/local/xenon # Install location of your final toolchain
-PARALLEL=-j
+PARALLEL=-j2 # NOTE: If set to `-j' with no number, host system freezes during build.
 
 BINUTILS=binutils-2.28
 GCC=gcc-6.3.0
@@ -14,7 +14,7 @@ GDB=gdb-6.8
 
 ZLIB=zlib-1.2.11
 LIBPNG=libpng-1.5.10
-BZIP2=bzip2-1.0.6
+BZIP2=bzip2-1.0.8
 FREETYPE=freetype-2.4.9
 
 # build stages
@@ -122,7 +122,8 @@ function toolchain_install
                   --enable-languages="c" --without-headers --disable-shared \
                   --with-newlib --disable-libmudflap --disable-libssp --disable-nls --disable-shared --without-headers \
                   --disable-decimal-float --enable-altivec \
-                  --with-gmp=/opt/local --with-mpfr=/opt/local --with-cpu=cell >> $LOGFILE 2>&1 || exit 1
+                  --with-gmp=/opt/local --with-mpfr=/opt/local --with-cpu=cell \
+		  CXXFLAGS="-fpermissive" >> $LOGFILE 2>&1 || exit 1
           echo -e "Building gcc, this could take a while..."
           make $PARALLEL all-gcc 2>&1 >> $LOGFILE || exit 1
           make install-gcc 2>&1 >> $LOGFILE || exit 1
@@ -156,9 +157,11 @@ function toolchain_install
           unset LIBRARY_PATH
           ../$GCC/configure --target=$TARGET --prefix=$PREFIX --with-libiconv-prefix=/opt/local --with-cpu=cell \
                   --with-gmp=/opt/local --with-mpfr=/opt/local --disable-decimal-float --disable-libquadmath \
-                  --enable-languages=c,c++ --disable-libssp --disable-libsanitizer --with-newlib --enable-cxx-flags="-G0" \
+                  --enable-languages=c,c++ --disable-libssp --disable-libsanitizer --with-newlib \
+		  --enable-cxx-flags="-G0" \
                   --disable-libmudflap --disable-nls --disable-shared --disable-linux-futex --enable-altivec \
-                  --disable-libatomic --disable-threads --disable-libgomp --disable-libitm -v >> $LOGFILE 2>&1 || exit 1
+                  --disable-libatomic --disable-threads --disable-libgomp --disable-libitm -v \
+		  CXXFLAGS="-fpermissive" >> $LOGFILE 2>&1 || exit 1
           echo -e "Building gcc - 2nd pass, this could take a while..."
           make $PARALLEL 2>&1 >> $LOGFILE || exit 1
           make install 2>&1 >> $LOGFILE || exit 1
@@ -186,13 +189,14 @@ function zlib_install
 	export CC=$TARGET-gcc
 	export CFLAGS="-mcpu=cell -mtune=cell -m32 -fno-pic -mpowerpc64 -Wno-error -L$DEVKITXENON/xenon/lib/32/ -T$DEVKITXENON/app.lds -u read -u _start -u exc_base -L$DEVKITXENON/usr/lib -I$DEVKITXENON/usr/include"
 	export LDFLAGS="$CFLAGS"
-	export TARGET=`gcc -v 2>&1 | sed -n '2p' | awk '{print $2}'`
+	export TARGET=xenon
 
 	echo -e "Configuring zlib..."
 	./configure --prefix=$DEVKITXENON/usr >> $LOGFILE 2>&1 || exit 1
 
 	sed '/cp $(SHAREDLIBV) $(DESTDIR)$(sharedlibdir)/d' Makefile > Makefile.xenon
 
+	export CC=xenon-gcc
 	echo -e "Building zlib..."
 	make $PARALLEL -f Makefile.xenon CROSS_COMPILE=$TARGET- libz.a >> $LOGFILE 2>&1 || exit 1
 	echo -e "Installing zlib..."
@@ -243,14 +247,14 @@ function libpng_install
 
 function bzip2_install
 {
-	if [ ! -f "$BZIP2.tar.gz" ]; then
-		echo -e "Downloading $BZIP2.tar.gz"
-		wget -c http://bzip.org/1.0.6/$BZIP2.tar.gz || exit 1
-	fi;
+	#if [ ! -f "$BZIP2.tar.gz" ]; then
+	#	echo -e "Downloading $BZIP2.tar.gz"
+	#	wget -c http://bzip.org/1.0.6/$BZIP2.tar.gz || exit 1
+	#fi;
 
-	echo -e "Extracting bzip2..."
-	rm -rf $BZIP2
-	tar xzf $BZIP2.tar.gz >> $LOGFILE 2>&1 && cat ../libxenon/ports/bzip2/bzip2.diff | patch -p0 >> $LOGFILE 2>&1 || exit 1
+	#echo -e "Extracting bzip2..."
+	#rm -rf $BZIP2
+	#tar xzf $BZIP2.tar.gz >> $LOGFILE 2>&1 && cat ../libxenon/ports/bzip2/bzip2.diff | patch -p0 >> $LOGFILE 2>&1 || exit 1
 	cd $BZIP2
 
 	echo -e "Building bzip2..."
@@ -453,7 +457,7 @@ if [ "$1" == "toolchain" ]; then
 	check_build-essential
     fi
     toolchain_install
-    libxenon_install
+    #libxenon_install
     all_done
 elif [ "$1" == "libs" ]; then
     zlib_install
