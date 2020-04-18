@@ -167,7 +167,12 @@ function toolchain_install
           make install 2>&1 >> $LOGFILE || exit 1
           cd ..
           rm -rf build/*
-          echo -e "Done"
+
+	  # copy the necessary asm.h file which is not copied to the target
+	  # during build. LibXenon will depend on this later.
+	  cp gcc-6.3.0/libffi/src/powerpc/asm.h ../libxenon/drivers/ppc/asm.h
+
+	  echo -e "Done"
         fi
 
         rm -rf build
@@ -247,14 +252,14 @@ function libpng_install
 
 function bzip2_install
 {
-	#if [ ! -f "$BZIP2.tar.gz" ]; then
-	#	echo -e "Downloading $BZIP2.tar.gz"
-	#	wget -c http://bzip.org/1.0.6/$BZIP2.tar.gz || exit 1
-	#fi;
+	if [ ! -f "$BZIP2.tar.gz" ]; then
+		echo -e "Downloading $BZIP2.tar.gz"
+		wget -c http://bzip.org/1.0.8/$BZIP2.tar.gz || exit 1
+	fi;
 
-	#echo -e "Extracting bzip2..."
-	#rm -rf $BZIP2
-	#tar xzf $BZIP2.tar.gz >> $LOGFILE 2>&1 && cat ../libxenon/ports/bzip2/bzip2.diff | patch -p0 >> $LOGFILE 2>&1 || exit 1
+	echo -e "Extracting bzip2..."
+	rm -rf $BZIP2
+	tar xzf $BZIP2.tar.gz >> $LOGFILE 2>&1 && cat ../libxenon/ports/bzip2/bzip2.diff | patch -p0 >> $LOGFILE 2>&1 || exit 1
 	cd $BZIP2
 
 	echo -e "Building bzip2..."
