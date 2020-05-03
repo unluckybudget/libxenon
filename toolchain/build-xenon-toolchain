@@ -14,7 +14,7 @@ GDB=gdb-6.8
 
 ZLIB=zlib-1.2.11
 LIBPNG=libpng-1.5.10
-BZIP2=bzip2-1.0.8
+BZIP2=bzip2-latest
 FREETYPE=freetype-2.4.9
 
 # build stages
@@ -205,7 +205,7 @@ function zlib_install
 	echo -e "Building zlib..."
 	make $PARALLEL -f Makefile.xenon CROSS_COMPILE=$TARGET- libz.a >> $LOGFILE 2>&1 || exit 1
 	echo -e "Installing zlib..."
-	sudo make -f Makefile.xenon CROSS_COMPILE=$TARGET- install >> $LOGFILE 2>&1 || exit 1
+	make -f Makefile.xenon CROSS_COMPILE=$TARGET- install >> $LOGFILE 2>&1 || exit 1
 	cd ..
 	rm -rf $ZLIB
 
@@ -239,7 +239,7 @@ function libpng_install
 	echo -e "Building libpng..."
 	make $PARALLEL CROSS_COMPILE=xenon- >> $LOGFILE 2>&1 || exit 1
 	echo -e "Installing libpng..."	
-	sudo make CROSS_COMPILE=xenon- install >> $LOGFILE 2>&1 || exit 1
+	make CROSS_COMPILE=xenon- install >> $LOGFILE 2>&1 || exit 1
 	cd ..
 	rm -rf $LIBPNG
 
@@ -253,19 +253,20 @@ function libpng_install
 function bzip2_install
 {
 	if [ ! -f "$BZIP2.tar.gz" ]; then
-		echo -e "Downloading $BZIP2.tar.gz"
-		wget -c http://bzip.org/1.0.8/$BZIP2.tar.gz || exit 1
+		echo -e "Downloading latest bzip...\n"
+		wget -c https://www.sourceware.org/pub/bzip2/bzip2-latest.tar.gz || exit 1
 	fi;
 
 	echo -e "Extracting bzip2..."
 	rm -rf $BZIP2
-	tar xzf $BZIP2.tar.gz >> $LOGFILE 2>&1 && cat ../libxenon/ports/bzip2/bzip2.diff | patch -p0 >> $LOGFILE 2>&1 || exit 1
-	cd $BZIP2
+	tar xzf $BZIP2.tar.gz >> $LOGFILE 2>&1 || exit 1
+	cd bzip2-1.0.8
+	cat ../../libxenon/ports/bzip2/bzip2.diff | patch -p1 >> $LOGFILE 2>&1 || exit 1
 
 	echo -e "Building bzip2..."
 	make $PARALLEL >> $LOGFILE 2>&1 || exit 1
 	echo -e "Installing bzip2..."
-	sudo make install >> $LOGFILE 2>&1 || exit 1
+	make install >> $LOGFILE 2>&1 || exit 1
 	cd ..
 	rm -rf $BZIP2
 	echo -e "Done"
@@ -277,7 +278,7 @@ function freetype_install
 		echo -e "Downloading $FREETYPE.tar.gz"
 		wget -c http://download.savannah.gnu.org/releases/freetype/$FREETYPE.tar.gz || exit 1
 	fi;
-	
+
 	echo -e "Extracting freetype..."
 	rm -rf $FREETYPE
 	tar xzf $FREETYPE.tar.gz >> $LOGFILE 2>&1 || exit 1
@@ -293,7 +294,7 @@ function freetype_install
 	echo -e "Building freetype..."
 	make $PARALLEL CROSS_COMPILE=$TARGET- >> $LOGFILE 2>&1 || exit 1
 	echo -e "Installing freetype..."
-	sudo make CROSS_COMPILE=$TARGET- install >> $LOGFILE 2>&1 || exit 1
+	make CROSS_COMPILE=$TARGET- install >> $LOGFILE 2>&1 || exit 1
 	cd ..
 	rm -rf $FREETYPE
 
@@ -308,7 +309,7 @@ function filesystems_install
 {
 	echo -e "Building Filesystems..."
 
-	filesystems="fat-xenon ext2fs-xenon xtaflib" # ntfs-xenon ext2fs-xenon xtaflib
+	filesystems="fat-xenon ext2fs-xenon xtaflib ntfs-xenon"
 
 	for i in $filesystems
 	do
@@ -320,19 +321,12 @@ function filesystems_install
 				cd $i
 				git checkout $FSBRANCH >> $LOGFILE 2>&1
 				cd ..
-			fi			
-		else
-			cd $i
-			if [ "" != "$FSBRANCH" ]; then
-				git checkout $FSBRANCH >> $LOGFILE 2>&1
-			fi	
-			git remote update >> $LOGFILE 2>&1
-			git status -uno | grep -q behind
-			if [ 0 -eq $? ]; then
-				echo -e -n "Updating... "
-				git pull >> $LOGFILE 2>&1
-				make clean >> $LOGFILE 2>&1
 			fi
+		fi
+		if [ $i == "fat-xenon" ]; then
+			echo -e "Patching fat-xenon"
+			cd $i
+			cat ../libfat.patch | patch -p1
 			cd ..
 		fi
 		echo -e -n "Building... "
@@ -465,12 +459,12 @@ if [ "$1" == "toolchain" ]; then
     #libxenon_install
     all_done
 elif [ "$1" == "libs" ]; then
-    #zlib_install
+    zlib_install
     bzip2_install
-    #libpng_install
-    #freetype_install
+    libpng_install
+    freetype_install
     bin2s_install
-    #filesystems_install
+    filesystems_install
 elif [ "$1" == "libxenon" ]; then
     libxenon_install
 elif [ "$1" == "zlib" ]; then

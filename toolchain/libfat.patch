@@ -1,0 +1,11 @@
+--- fat-xenon/source/libfat.c	2020-05-03 18:42:47.518984188 -0400
++++ fat-xenon-orig/source/libfat.c	2020-05-03 18:42:12.213340183 -0400
+@@ -39,6 +39,8 @@
+ #include "mem_allocate.h"
+ #include "disc.h"
+ 
++#define MAXPATHLEN 32
++
+ static const devoptab_t dotab_fat = {
+ 	"fat",
+ 	sizeof (FILE_STRUCT),
