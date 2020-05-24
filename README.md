@@ -4,7 +4,7 @@ https://github.com/Free60Project/libxenon
 This repository contains changes to the toolchain build script to get it operational in 2020. Tested on Ubuntu 19.10. I also reduced the crashdump timeout from 30 seconds to 10 seconds, and XeLL reboot to SMC reboot. ISO9660 had a minor bug with strncmp which was also fixed.
 
 Ubuntu Depends:
-  automake autoconf build-essential libmpfr-dev libmpc-dev libgmp-dev bison bc
+  automake autoconf build-essential libmpfr-dev libmpc-dev libgmp-dev flex bison bc gcc-multilib
   
 Build the Toolchain
 
@@ -32,37 +32,19 @@ Build the Toolchain
 
 Installing extra libraries for added functionality
 
-	./build-xenon-toolchain libxenon
-  	Will build and install libxenon library.
+  The below one liner will cross compile and install to the $DEVKITXENON prefix: 
+    bin2s, bzip2, zlib, freetype, libpng, libfat, libext2fs, libxtaf, and libntfs
 
-	./build-xenon-toolchain filesystems
-  	This will build ext2, xtaf, and ntfs libraries.
-
-	./build-xenon-toolchain freetype
-  	Will build the freetype font engine.
-
-	./build-xenon-toolchain zlib
-  	Run this, let the script fail, then cd into the zlib directory.
-  	Run export CC=xenon-gcc
-  	Run ./configure --prefix=/usr/local/xenon
- 	Run make && make install
-
-	./build-xenon-toolchain libpng
-  	Will install libpng, a library for loading and displaying .png images.
-  
 	./build-xenon-toolchain libs
-  	Will install bzip2 compression library, and bin2s
+	
   
-  libSDL 1.2
+  libSDL 1.2 - SDL 1.2 targeting the Xbox 360, utilizing libxenon.
   	
 	git clone https://github.com/LibXenonProject/libSDLXenon
   	cd libSDLXenon
   	make -f Makefile.xenon
   
-  An undefined reference to ceil() will be thrown despite the correct includes. To fix, edit the file reporting the error
-  and add a function definition for ceil(). 
-  
-libZLX - A custom C++ library for interfacing with libxenon, for the purpose of building CLI and GUI apps.
+  libZLX - A custom C++ library utilizing libxenon, for the purpose of building CLI and GUI apps.
 
 	git clone https://github.com/LibXenonProject/zlx-library
   	cd zlx-library
