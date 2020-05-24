@@ -329,6 +329,12 @@ function filesystems_install
 			cat ../libfat.patch | patch -p1
 			cd ..
 		fi
+		if [ $i == "ext2fs-xenon" ]; then
+			echo -e "Patching ext2fs-xenon"
+			cd $i
+			cat ../ext2fs-xenon.patch | patch -p1
+			cd ..
+		fi
 		echo -e -n "Building... "
 		make -C $i >> $LOGFILE 2>&1 || exit 1
 		echo -e -n "Installing... "

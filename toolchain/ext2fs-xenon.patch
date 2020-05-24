@@ -1,0 +1,11 @@
+--- ext2fs-xenon/source/Makefile	2020-05-23 21:26:42.702060545 -0400
++++ ext2fs-orig/source/Makefile	2020-05-23 21:25:43.712580547 -0400
+@@ -20,7 +20,7 @@
+ #---------------------------------------------------------------------------------
+ # options for code generation
+ #---------------------------------------------------------------------------------
+-CFLAGS		=	-O2 -Wall -Wno-unused $(MACHDEP) $(INCLUDE) -DXENON -DWORDS_BIGENDIAN -U__linux__
++CFLAGS		=	-O2 -std=gnu89 -Wall -Wno-unused $(MACHDEP) $(INCLUDE) -DXENON -DWORDS_BIGENDIAN -U__linux__
+ CXXFLAGS	=	$(CFLAGS)
+ ASFLAGS		:=	-g
+ export EXT2BIN	:=	$(LIBDIR)/$(PLATFORM)/libext2fs.a
