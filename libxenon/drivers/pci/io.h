@@ -3,24 +3,10 @@
 
 #include <stdint.h>
 
-static inline __attribute__((always_inline)) uint32_t read32(long addr)
-{
-	return __builtin_bswap32(*(volatile uint32_t*)addr);
-}
+uint32_t read32(long addr);
+uint32_t read32n(long addr);
 
-static inline __attribute__((always_inline)) uint32_t read32n(long addr)
-{
-	return *(volatile uint32_t*)addr;
-}
-
-static inline __attribute__((always_inline)) void write32(long addr, uint32_t val)
-{
-	*(volatile uint32_t*)addr = __builtin_bswap32(val);
-}
-
-static inline __attribute__((always_inline)) void write32n(long addr, uint32_t val)
-{
-	*(volatile uint32_t*)addr = val;
-}
+void write32(long addr, uint32_t val);
+void write32n(long addr, uint32_t val);
 
 #endif
