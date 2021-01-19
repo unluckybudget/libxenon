@@ -12,7 +12,7 @@ Build the Toolchain
 	
   	cd libxenon/toolchain
   
-	nano buid-xenon-toolchain - set PARALLEL=jx where x is the amount of CPU cores available.
+	nano build-xenon-toolchain - set PARALLEL=jx where x is the amount of CPU cores available.
   
   	sudo mkdir /usr/local/xenon
 	sudo chown -R USER:USER /usr/local/xenon
